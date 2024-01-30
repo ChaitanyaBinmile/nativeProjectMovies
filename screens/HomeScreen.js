@@ -15,14 +15,15 @@ import {
 import { styles } from "../theme";
 import TrendingMovies from "../components/trendingMovies";
 import MovieList from "../components/movieList";
+import { useNavigation } from "@react-navigation/native";
 
-const ios = Platform.OS == "ios";
+export const ios = Platform.OS == "ios";
 
 export default function HomeScreen() {
   const [trending, setTrending] = useState([1, 2]);
   const [upcoming, setUpcoming] = useState([1, 2, 3]);
   const [topRated, setTopRated] = useState([1, 2, 3, 4]);
-
+  const navigation = useNavigation();
   return (
     <View className="flex-1 bg-neutral-900">
       <SafeAreaView className={ios ? "-mb-2" : "mb-3 mt-2"}>
@@ -32,7 +33,7 @@ export default function HomeScreen() {
           <Text className="text-white text-3xl font-bold">
             <Text style={styles.text}>M</Text>ovies
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Search")}>
             <MagnifyingGlassIcon size="30" strokeWidth={2} color="white" />
           </TouchableOpacity>
         </View>
