@@ -8,6 +8,7 @@ import {
 import React from "react";
 import Carousel from "react-native-snap-carousel";
 import { useNavigation } from "@react-navigation/native";
+import { image500 } from "../api/moviedb";
 
 export var { width, height } = Dimensions.get("window");
 
@@ -36,9 +37,9 @@ const MovieCard = ({ item }) => {
     navigation.navigate("Movie", item);
   };
   return (
-    <TouchableWithoutFeedback onPress={()=>handleClick(item)}>
+    <TouchableWithoutFeedback onPress={() => handleClick(item)}>
       <Image
-        source={require("../assets/Movie2.jpg")}
+        source={{uri:image500(item.poster_path)}}
         style={{
           width: width * 0.6,
           height: height * 0.4,

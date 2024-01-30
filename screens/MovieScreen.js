@@ -11,16 +11,48 @@ import { height, width } from "../components/trendingMovies";
 import { LinearGradient } from "expo-linear-gradient";
 import Cast from "../components/cast";
 import MovieList from "../components/movieList";
+import Loading from "../components/loading";
+import {
+  fallbackMoviePoster,
+  fetchMovieCredits,
+  fetchMovieDetails,
+  fetchSimilarMovies,
+  image500,
+} from "../api/moviedb";
 
 export default function MovieScreen() {
   const { params: item } = useRoute();
   const [isFavourite, toggleFavourite] = useState(false);
-  const [cast, setCast] = useState([1,2,3,4,5]);
-  const [similarMovies, setSimilarMovies] = useState([1,2,3,4,5])
+  const [cast, setCast] = useState([]);
+  const [similarMovies, setSimilarMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [movie, setMovie] = useState({});
 
-  // useEffect(() => {
-  //   // call movie details api
-  // }, [item]);
+  useEffect(() => {
+    setLoading(true);
+    getMovieDetails(item.id);
+    getMovieCredits(item.id);
+    getSimilarMovies(item.id);
+  }, [item]);
+
+  const getMovieDetails = async (id) => {
+    const data = await fetchMovieDetails(id);
+    if (data) setMovie(data);
+    setLoading(false);
+  };
+
+  const getMovieCredits = async (id) => {
+    const data = await fetchMovieCredits(id);
+    // console.log(data)
+    if (data && data.cast) setCast(data.cast);
+  };
+
+  const getSimilarMovies = async (id) => {
+    const data = await fetchSimilarMovies(id);
+    if (data && data.results) setSimilarMovies(data.results);
+    // console.log(similarMovies)
+  };
+
   const navigation = useNavigation();
 
   const handleBack = (item) => {
@@ -53,53 +85,74 @@ export default function MovieScreen() {
             />
           </TouchableOpacity>
         </SafeAreaView>
-        <View>
-          <Image
-            source={require("../assets/Movie2.jpg")}
-            style={{
-              width,
-              height: height * 0.55,
-            }}
-            className="rounded-3xl"
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(23,23,23,0.8)", "rgba(23,23,23,1)"]}
-            style={{ width, height: height * 0.3 }}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            className="absolute bottom-0"
-          />
-        </View>
+        {loading ? (
+          <Loading />
+        ) : (
+          <View>
+            <Image
+              // source={require("../assets/Movie2.jpg")}
+              source={{
+                uri: image500(movie?.poster_path) || fallbackMoviePoster,
+              }}
+              style={{
+                width,
+                height: height * 0.55,
+              }}
+              className="rounded-3xl"
+            />
+            <LinearGradient
+              colors={["transparent", "rgba(23,23,23,0.8)", "rgba(23,23,23,1)"]}
+              style={{ width, height: height * 0.3 }}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              className="absolute bottom-0"
+            />
+          </View>
+        )}
       </View>
       {/* movie details */}
       <View style={{ marginTop: -(height * 0.09) }} className="space-y-3">
         <Text className="text-white text-center text-3xl font-bold tracking-wider">
-          {movieName}
+          {movie?.title}
         </Text>
+
         {/* status, release, runtime */}
-        <Text className="text-neutral-400 font-semibold text-base text-center">
-          Released • 2020 • 170 min
-        </Text>
+        {movie?.id ? (
+          <Text className="text-neutral-400 font-semibold text-base text-center">
+            {movie?.status} • {movie?.release_date?.split("-")[0]} •{" "}
+            {movie?.runtime} min
+          </Text>
+        ) : null}
 
         {/* genres */}
         <View className="flex-row justify-center mx-4 space-x-2">
-          <Text className="text-neutral-400 font-semibold text-base text-center">
-            Action • Thrill • Comedy
-          </Text>
+          {movie?.genres?.map((genre, index) => {
+            let showDot = index + 1 != movie.genres.length;
+            return (
+              <Text
+                key={index}
+                className="text-neutral-400 font-semibold text-base text-center"
+              >
+                {genre?.name} {showDot ? "•" : null}
+              </Text>
+            );
+          })}
         </View>
         {/* description */}
         <Text className="text-neutral-400 mx-1 font-semibold text-base text-center">
-          Very good movie! I watched it four times, not coz it was
-          captivating, but due to my slow brain. On the fifth try, I grasped the
-          entire story. That's all I can write without leaking any spoilers. So,
-          for the remaining lines, I'm jotting down random stuff. Whether you
-          guys watch it or not, I don't give two dams, bui...
+          {movie?.overview}
         </Text>
       </View>
       {/* cast */}
-      <Cast cast={cast} navigation={navigation}/>
+      {cast.length > 0 && <Cast cast={cast} navigation={navigation} />}
       {/* similar movies */}
-      <MovieList title="Similar Movies" hideSeeAll={true} data={similarMovies}/>
+      {similarMovies.length > 0 && (
+        <MovieList
+          title="Similar Movies"
+          hideSeeAll={true}
+          data={similarMovies}
+        />
+      )}
     </ScrollView>
   );
 }
