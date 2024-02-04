@@ -7,13 +7,15 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { styles } from "../theme";
+import { styles, theme } from "../theme";
 import { ChevronLeftIcon } from "react-native-heroicons/outline";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ios } from "./HomeScreen";
 import { height, width } from "../components/trendingMovies";
-import MovieList from "../components/movieList";
 import Loading from "../components/loading";
+import MovieList from "../components/movieList";
+import * as Progress from "react-native-progress";
+
 import {
   fallbackPersonImage,
   fetchPersonDetails,
@@ -42,9 +44,9 @@ export default function PersonScreen() {
 
   const getPersonDetails = async (id) => {
     const data = await fetchPersonDetails(id);
+    setLoading(false)
     // console.log(data)
     if(data)setPerson(data);
-    setLoading(false);
   };
   const getPersonMovies = async (id) => {
     const data = await fetchPersonMovies(id);
@@ -71,7 +73,16 @@ export default function PersonScreen() {
       </SafeAreaView>
       {/* person view */}
       {loading ? (
-        <Loading />
+        <View
+        style={{ height, width }}
+        className="absolute flex-row justify-center items-center"
+      >
+        <Progress.CircleSnail
+          thickness={12}
+          size={160}
+          color={theme.background}
+        />
+      </View>
       ) : (
         <View>
           <View

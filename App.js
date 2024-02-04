@@ -1,10 +1,11 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import Navigation from "./navigation";
+import { Provider, useSelector } from "react-redux";
+import { store } from "./app/store";
+import RouteHandler from "./router/RouteHandler";
 
 export default function App() {
   return (
-   <Navigation/>
+    <Provider store={store}>
+      <RouteHandler/>
+    </Provider>
   );
 }
-

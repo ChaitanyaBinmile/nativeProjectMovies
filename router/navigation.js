@@ -2,12 +2,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 import React from "react";
-import HomeScreen from "./screens/HomeScreen";
-import MovieScreen from "./screens/MovieScreen";
-import PersonScreen from "./screens/PersonScreen";
-import SearchScreen from "./screens/SearchScreen";
+import HomeScreen from "../screens/HomeScreen";
+import MovieScreen from "../screens/MovieScreen";
+import PersonScreen from "../screens/PersonScreen";
+import SearchScreen from "../screens/SearchScreen";
+import LoginScreen from "../screens/LoginScreen";
 
-const Navigation = () => {
+export const PrivateNavigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -20,4 +21,14 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export const PublicNavigation = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+
